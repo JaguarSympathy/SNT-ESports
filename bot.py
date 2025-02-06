@@ -1,3 +1,12 @@
+# *******************************************************
+# This file is part of the SNT-Esports project. Please see the README.md file for information.
+#  
+# This file and its content can not be copied and/or distributed without the express
+# permission of JaguarSympathy.
+#
+# The project is developed solely and indepedently by JaguarSympathy. All rights are reserved.
+# *******************************************************
+
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
