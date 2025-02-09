@@ -92,4 +92,14 @@ async def settings(interaction: discord.Interaction, setting: str, value: str):
     else:
         await interaction.response.send_message("Invalid setting.",ephemeral=True)
 
+@tree.command(name="level",description="Check your current level")
+async def level(interaction: discord.Interaction):
+    with open("leveling.json","r") as f:
+        levelingData = json.load(f)
+
+    if interaction.user.id not in levelingData:
+        levelingData[interaction.user.id] = {"xp":0,"level":0}
+
+    await interaction.response.send_message(f"Your current level is {levelingData[interaction.user.id]['level']} with {levelingData[interaction.user.id]['xp']} xp.",ephemeral=True)
+
 client.run(TOKEN)
