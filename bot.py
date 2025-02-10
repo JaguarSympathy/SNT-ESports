@@ -21,6 +21,7 @@ WELCOME_CHANNEL = 000000000000000000
 IMG_WELCOME = "https://media.discordapp.net/attachments/1336054298400002108/1337101833629466625/standard_8.gif"
 LEVELING_REQUIREMENT = 100
 DEVELOPER = 610020302692417546
+OWNER = 1141388902268153856
 ANNOUNCEMENTS = 1322616470244429964
 SNT_GUILD = 1318946168943677472
 LEVELING_CHANNEL = 1327362472318996551
@@ -54,11 +55,11 @@ async def on_member_join(member: discord.Member):
 async def on_message(message: discord.Message):
     if message.author.bot == False and message.guild.id == SNT_GUILD:
         with open("leveling.json","r") as f:
-            levelingData = json.load(f)
+            levelingData:dict = json.load(f)
 
-        if message.author.id in levelingData:
-            levelingData[message.author.id]["xp"] += 1
-        else:
+        try:
+            levelingData[message.author.id]["xp"] = levelingData[message.author.id]["xp"] + 1
+        except KeyError:
             levelingData[message.author.id] = {"xp":0,"level":0}
 
 
@@ -80,33 +81,36 @@ async def on_message(message: discord.Message):
 @app_commands.describe(setting="Setting to update",value="Value to set")
 @app_commands.choices(setting=[app_commands.Choice(name="Welcome Channel",value="Welcome Channel"),app_commands.Choice(name="Welcome Image",value="Welcome Image"),app_commands.Choice(name="Leveling Requirement",value="Leveling Requirement"),app_commands.Choice(name="Leveling Channel",value="Leveling Channel")])
 async def settings(interaction: discord.Interaction, setting: str, value: str):
-    global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT
-    if setting == "Welcome Channel":
-        WELCOME_CHANNEL = int(value)
-        with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
-        
-        await interaction.response.send_message(f"Updated welcome channel to {value}.",ephemeral=True)
-    elif setting == "Welcome Image":
-        IMG_WELCOME = value
-        with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
-        
-        await interaction.response.send_message(f"Updated welcome image to {value}.",ephemeral=True)
-    elif setting == "Leveling Requirement":
-        LEVELING_REQUIREMENT = int(value)
-        with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
+    if interaction.user.id == DEVELOPER or interaction.user.id == OWNER:
+        global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT,LEVELING_CHANNEL
+        if setting == "Welcome Channel":
+            WELCOME_CHANNEL = int(value)
+            with open("settings.json","w") as f:
+                json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
+            
+            await interaction.response.send_message(f"Updated welcome channel to {value}.",ephemeral=True)
+        elif setting == "Welcome Image":
+            IMG_WELCOME = value
+            with open("settings.json","w") as f:
+                json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
+            
+            await interaction.response.send_message(f"Updated welcome image to {value}.",ephemeral=True)
+        elif setting == "Leveling Requirement":
+            LEVELING_REQUIREMENT = int(value)
+            with open("settings.json","w") as f:
+                json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
 
-        await interaction.response.send_message(f"Updated leveling requirement to {value}.",ephemeral=True)
-    elif setting == "Leveling Channel":
-        LEVELING_CHANNEL = int(value)
-        with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
+            await interaction.response.send_message(f"Updated leveling requirement to {value}.",ephemeral=True)
+        elif setting == "Leveling Channel":
+            LEVELING_CHANNEL = int(value)
+            with open("settings.json","w") as f:
+                json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
 
-        await interaction.response.send_message(f"Updated leveling channel to {value}.",ephemeral=True)
+            await interaction.response.send_message(f"Updated leveling channel to {value}.",ephemeral=True)
+        else:
+            await interaction.response.send_message("Invalid setting.",ephemeral=True)
     else:
-        await interaction.response.send_message("Invalid setting.",ephemeral=True)
+        await interaction.response.send_message("You do not have permission to run this command!")
 
 @tree.command(name="level",description="Check your current level")
 async def level(interaction: discord.Interaction):
