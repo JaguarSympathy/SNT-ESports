@@ -47,7 +47,7 @@ async def on_ready():
 async def on_member_join(member: discord.Member):
     channel = await client.fetch_channel(WELCOME_CHANNEL)
     embed = discord.Embed(title=f"Welcome to {member.guild.name} {member.name}!",description="Please read the rules. Apply for the team via our application tickets. Enjoy!",colour=discord.Colour.purple())
-    embed.set_image(IMG_WELCOME)
+    embed.set_image(url=IMG_WELCOME)
     await channel.send(f"Welcome {member.mention}!", embed=embed)
 
 @client.event
@@ -56,10 +56,11 @@ async def on_message(message: discord.Message):
         with open("leveling.json","r") as f:
             levelingData = json.load(f)
 
-        if message.author.id not in levelingData:
-            levelingData[message.author.id] = {"xp":0,"level":0}
-        else:
+        if message.author.id in levelingData:
             levelingData[message.author.id]["xp"] += 1
+        else:
+            levelingData[message.author.id] = {"xp":0,"level":0}
+
 
         level = levelingData[message.author.id]["xp"] // int(LEVELING_REQUIREMENT)
         if level > levelingData[message.author.id]["level"]:
