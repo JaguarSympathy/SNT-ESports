@@ -23,6 +23,7 @@ LEVELING_REQUIREMENT = 100
 DEVELOPER = 610020302692417546
 ANNOUNCEMENTS = 1322616470244429964
 SNT_GUILD = 1318946168943677472
+LEVELING_CHANNEL = 1327362472318996551
 
 # -- Initialisation -- #
 client = discord.Client(intents=discord.Intents.all())
@@ -33,12 +34,13 @@ tree = app_commands.CommandTree(client=client)
 async def on_ready():
     await tree.sync()
 
-    global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT
+    global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT,LEVELING_CHANNEL
     with open("settings.json","r") as f:
         settingsData = json.load(f)
         WELCOME_CHANNEL = settingsData["welcome_channel"]
         IMG_WELCOME = settingsData["img_welcome"]
         LEVELING_REQUIREMENT = settingsData["leveling_requirement"]
+        LEVELING_CHANNEL = settingsData["leveling_channel"]
 
 
 @client.event
@@ -59,7 +61,7 @@ async def on_message(message: discord.Message):
         else:
             levelingData[message.author.id]["xp"] += 1
 
-        level = int(levelingData[message.author.id]["xp"]) // int(LEVELING_REQUIREMENT)
+        level = levelingData[message.author.id]["xp"] // int(LEVELING_REQUIREMENT)
         if level > levelingData[message.author.id]["level"]:
             levelingData[message.author.id]["level"] = level
 
@@ -75,27 +77,33 @@ async def on_message(message: discord.Message):
 # -- Commands -- #
 @tree.command(name="settings",description="Update bot settings")
 @app_commands.describe(setting="Setting to update",value="Value to set")
-@app_commands.choices(setting=[app_commands.Choice(name="Welcome Channel",value="Welcome Channel"),app_commands.Choice(name="Welcome Image",value="Welcome Image"),app_commands.Choice(name="Leveling Requirement",value="Leveling Requirement")])
+@app_commands.choices(setting=[app_commands.Choice(name="Welcome Channel",value="Welcome Channel"),app_commands.Choice(name="Welcome Image",value="Welcome Image"),app_commands.Choice(name="Leveling Requirement",value="Leveling Requirement"),app_commands.Choice(name="Leveling Channel",value="Leveling Channel")])
 async def settings(interaction: discord.Interaction, setting: str, value: str):
     global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT
     if setting == "Welcome Channel":
-        WELCOME_CHANNEL = value
+        WELCOME_CHANNEL = int(value)
         with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME},f)
+            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
         
         await interaction.response.send_message(f"Updated welcome channel to {value}.",ephemeral=True)
     elif setting == "Welcome Image":
         IMG_WELCOME = value
         with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME},f)
+            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
         
         await interaction.response.send_message(f"Updated welcome image to {value}.",ephemeral=True)
     elif setting == "Leveling Requirement":
-        LEVELING_REQUIREMENT = value
+        LEVELING_REQUIREMENT = int(value)
         with open("settings.json","w") as f:
-            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT},f)
+            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
 
         await interaction.response.send_message(f"Updated leveling requirement to {value}.",ephemeral=True)
+    elif setting == "Leveling Channel":
+        LEVELING_CHANNEL = int(value)
+        with open("settings.json","w") as f:
+            json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
+
+        await interaction.response.send_message(f"Updated leveling channel to {value}.",ephemeral=True)
     else:
         await interaction.response.send_message("Invalid setting.",ephemeral=True)
 
