@@ -58,7 +58,7 @@ async def on_message(message: discord.Message):
         else:
             levelingData[message.author.id]["xp"] += 1
 
-        level = levelingData[message.author.id]["xp"] // LEVELING_REQUIREMENT
+        level = int(levelingData[message.author.id]["xp"]) // int(LEVELING_REQUIREMENT)
         if level > levelingData[message.author.id]["level"]:
             levelingData[message.author.id]["level"] = level
 
