@@ -76,19 +76,19 @@ async def settings(interaction: discord.Interaction, setting: str, value: str):
         with open("settings.json","w") as f:
             json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME},f)
         
-        await interaction.response.send_message("Updated welcome channel.",ephemeral=True)
+        await interaction.response.send_message(f"Updated welcome channel to {value}.",ephemeral=True)
     elif setting == "Welcome Image":
         IMG_WELCOME = value
         with open("settings.json","w") as f:
             json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME},f)
         
-        await interaction.response.send_message("Updated welcome image.",ephemeral=True)
+        await interaction.response.send_message(f"Updated welcome image to {value}.",ephemeral=True)
     elif setting == "Leveling Requirement":
         LEVELING_REQUIREMENT = value
         with open("settings.json","w") as f:
             json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT},f)
 
-        await interaction.response.send_message("Updated leveling requirement.",ephemeral=True)
+        await interaction.response.send_message(f"Updated leveling requirement to {value}.",ephemeral=True)
     else:
         await interaction.response.send_message("Invalid setting.",ephemeral=True)
 
@@ -99,7 +99,9 @@ async def level(interaction: discord.Interaction):
 
     if interaction.user.id not in levelingData:
         levelingData[interaction.user.id] = {"xp":0,"level":0}
-
-    await interaction.response.send_message(f"Your current level is {levelingData[interaction.user.id]['level']} with {levelingData[interaction.user.id]['xp']} xp.",ephemeral=True)
+    
+    embed = discord.Embed(title=f"Level for {interaction.user.name}",description=f"Your current level is {levelingData[interaction.user.id]['level']} with {levelingData[interaction.user.id]['xp']} xp.",colour=discord.Colour.blurple(),timestamp=interaction.created_at)
+    embed.set_author("SNT Bot")
+    await interaction.response.send_message(embed=embed)
 
 client.run(TOKEN)
