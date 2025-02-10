@@ -52,7 +52,7 @@ async def on_member_join(member: discord.Member):
 
 @client.event
 async def on_message(message: discord.Message):
-    if message.author.bot == False and message.guild == SNT_GUILD:
+    if message.author.bot == False and message.guild.id == SNT_GUILD:
         with open("leveling.json","r") as f:
             levelingData = json.load(f)
 
