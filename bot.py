@@ -101,7 +101,7 @@ async def level(interaction: discord.Interaction):
         levelingData[interaction.user.id] = {"xp":0,"level":0}
     
     embed = discord.Embed(title=f"Level for {interaction.user.name}",description=f"Your current level is {levelingData[interaction.user.id]['level']} with {levelingData[interaction.user.id]['xp']} xp.",colour=discord.Colour.blurple(),timestamp=interaction.created_at)
-    embed.set_author("SNT Bot")
+    embed.set_author(name="SNT Bot")
     await interaction.response.send_message(embed=embed)
 
 client.run(TOKEN)
