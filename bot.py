@@ -22,6 +22,7 @@ IMG_WELCOME = "https://media.discordapp.net/attachments/1336054298400002108/1337
 LEVELING_REQUIREMENT = 100
 DEVELOPER = 610020302692417546
 ANNOUNCEMENTS = 1322616470244429964
+SNT_GUILD = 1318946168943677472
 
 # -- Initialisation -- #
 client = discord.Client(intents=discord.Intents.all())
@@ -49,7 +50,7 @@ async def on_member_join(member: discord.Member):
 
 @client.event
 async def on_message(message: discord.Message):
-    if message.author.bot == False:
+    if message.author.bot == False and message.guild == SNT_GUILD:
         with open("leveling.json","r") as f:
             levelingData = json.load(f)
 
@@ -67,9 +68,9 @@ async def on_message(message: discord.Message):
         with open("leveling.json","w") as f:
             json.dump(levelingData,f)
 
-        if message.author.id == DEVELOPER:
-            if message.content.startswith("!announce "):
-                await client.fetch_channel(ANNOUNCEMENTS).send(message.content[10:])
+    if message.author.id == DEVELOPER:
+        if message.content.startswith("!announce "):
+            await client.fetch_channel(ANNOUNCEMENTS).send(message.content[10:])
 
 # -- Commands -- #
 @tree.command(name="settings",description="Update bot settings")
