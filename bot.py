@@ -20,6 +20,8 @@ TOKEN = os.getenv("DISCORD_CLIENT_TOKEN")
 WELCOME_CHANNEL = 000000000000000000
 IMG_WELCOME = "https://media.discordapp.net/attachments/1336054298400002108/1337101833629466625/standard_8.gif"
 LEVELING_REQUIREMENT = 100
+DEVELOPER = 610020302692417546
+ANNOUNCEMENTS = 1322616470244429964
 
 # -- Initialisation -- #
 client = discord.Client(intents=discord.Intents.all())
@@ -65,6 +67,9 @@ async def on_message(message: discord.Message):
         with open("leveling.json","w") as f:
             json.dump(levelingData,f)
 
+        if message.author.id == DEVELOPER:
+            if message.content.startswith("!announce "):
+                await client.fetch_channel(ANNOUNCEMENTS).send(message.content[10:])
 
 # -- Commands -- #
 @tree.command(name="settings",description="Update bot settings")
@@ -101,8 +106,9 @@ async def level(interaction: discord.Interaction):
     if interaction.user.id not in levelingData:
         levelingData[interaction.user.id] = {"xp":0,"level":0}
     
-    embed = discord.Embed(title=f"Level for {interaction.user.name}",description=f"Your current level is {levelingData[interaction.user.id]['level']} with {levelingData[interaction.user.id]['xp']} xp.",colour=discord.Colour.blurple(),timestamp=interaction.created_at)
-    embed.set_author(name="SNT Bot")
+    embed = discord.Embed(title=f"Level Information",colour=discord.Colour.blurple(),timestamp=interaction.created_at)
+    embed.set_author(name=interaction.user.display_name,icon_url=client.user.avatar.url).set_thumbnail(url=interaction.user.avatar.url)
+    embed.add_field(name="Level",value=levelingData[interaction.user.id]["level"]).add_field(name="XP",value=levelingData[interaction.user.id]["xp"])
     await interaction.response.send_message(embed=embed)
 
 client.run(TOKEN)
