@@ -30,11 +30,12 @@ tree = app_commands.CommandTree(client=client)
 async def on_ready():
     await tree.sync()
 
-    global WELCOME_CHANNEL,IMG_WELCOME
+    global WELCOME_CHANNEL,IMG_WELCOME,LEVELING_REQUIREMENT
     with open("settings.json","r") as f:
         settingsData = json.load(f)
         WELCOME_CHANNEL = settingsData["welcome_channel"]
         IMG_WELCOME = settingsData["img_welcome"]
+        LEVELING_REQUIREMENT = settingsData["leveling_requirement"]
 
 
 @client.event
