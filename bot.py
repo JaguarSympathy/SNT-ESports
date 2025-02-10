@@ -58,23 +58,25 @@ async def on_message(message: discord.Message):
             levelingData:dict = json.load(f)
 
         try:
-            levelingData[message.author.id]["xp"] = levelingData[message.author.id]["xp"] + 1
+            levelingData[str(message.author.id)]["xp"] = levelingData[str(message.author.id)]["xp"] + 1
         except KeyError:
-            levelingData[message.author.id] = {"xp":0,"level":0}
+            levelingData[str(message.author.id)] = {"xp":0,"level":0}
 
 
-        level = levelingData[message.author.id]["xp"] // int(LEVELING_REQUIREMENT)
-        if level > levelingData[message.author.id]["level"]:
-            levelingData[message.author.id]["level"] = level
+        level = levelingData[str(message.author.id)]["xp"] // int(LEVELING_REQUIREMENT)
+        if level > levelingData[str(message.author.id)]["level"]:
+            levelingData[str(message.author.id)]["level"] = level
 
             await message.channel.send(f"Congratulations {message.author.mention}! You have reached level {level}!")
 
         with open("leveling.json","w") as f:
             json.dump(levelingData,f)
+            f.close()
 
     if message.author.id == DEVELOPER:
         if message.content.startswith("!announce "):
-            await client.fetch_channel(ANNOUNCEMENTS).send(message.content[10:])
+            channel = await client.fetch_channel(ANNOUNCEMENTS)
+            await channel.send(message.content[10:])
 
 # -- Commands -- #
 @tree.command(name="settings",description="Update bot settings")
