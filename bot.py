@@ -150,22 +150,24 @@ async def level(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 @tree.command(name="reaction-role",description="Add or remove a reaction role")
-@app_commands.describe(message="Message to add reaction role to",emoji="Emoji to react with",role="Role to add", remove="Remove the reaction role")
-async def reaction_roles(interaction: discord.Interaction, message: discord.Message, emoji: str, role: discord.Role, remove: bool = False):
+@app_commands.describe(message="Message ID to add reaction role to",emoji="Emoji to react with",role="Role to add", remove="Remove the reaction role")
+async def reaction_roles(interaction: discord.Interaction, message: str, emoji: str, role: discord.Role, remove: bool = False):
     if interaction.user.id == DEVELOPER or interaction.user.id == OWNER:
         with open("reaction_roles.json","r") as f:
             reactionRoles = json.load(f)
         
+        message = int(message)
+
         if remove:
             try:
-                del reactionRoles[message.id][emoji]
+                del reactionRoles[message][emoji]
             except KeyError:
                 await interaction.response.send_message("Reaction role not found!",ephemeral=True)
         else:
-            if message.id not in reactionRoles:
-                reactionRoles[message.id] = {}
+            if message not in reactionRoles:
+                reactionRoles[message] = {}
             
-            reactionRoles[message.id][emoji] = role.id
+            reactionRoles[message][emoji] = role.id
 
 
         with open("reaction_roles.json","w") as f:
