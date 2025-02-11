@@ -175,11 +175,10 @@ async def reaction_roles(interaction: discord.Interaction, message: str, emoji: 
             
             reactionRoles[message][emoji] = role.id
 
+            await interaction.response.send_message("Reaction role updated!") 
 
         with open("reaction_roles.json","w") as f:
-            json.dump(reactionRoles,f)
-
-        await interaction.response.send_message("Reaction role updated!")            
+            json.dump(reactionRoles,f)           
     else:
         await interaction.response.send_message("You do not have permission to run this command!")
 
