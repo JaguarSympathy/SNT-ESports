@@ -84,8 +84,11 @@ async def on_reaction_add(reaction: discord.Reaction,member: discord.Member):
         reactionRoles = json.load(f)
     
     try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][reaction.emoji])
-        await member.add_roles(role)
+        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][str(reaction.emoji)])
+        await member.add_roles(role,reason="Reaction role")
+
+        embed = discord.Embed(title="Reaction Roles",description=f"You have been added to the role {role.name}.",colour=discord.Colour.green()).set_author(name=member.display_name,icon_url=member.avatar.url)
+        await member.send(embed=embed)
     except KeyError:
         pass
 
@@ -95,8 +98,11 @@ async def on_reaction_remove(reaction: discord.Reaction,member: discord.Member):
         reactionRoles = json.load(f)
     
     try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][reaction.emoji])
-        await member.remove_roles(role)
+        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][str(reaction.emoji)])
+        await member.remove_roles(role,reason="Reaction role")
+
+        embed = discord.Embed(title="Reaction Roles",description=f"You have been removed from the role {role.name}.",colour=discord.Colour.red()).set_author(name=member.display_name,icon_url=member.avatar.url)
+        await member.send(embed=embed)
     except KeyError:
         pass
 
@@ -112,27 +118,27 @@ async def settings(interaction: discord.Interaction, setting: str, value: str):
             with open("settings.json","w") as f:
                 json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
             
-            await interaction.response.send_message(f"Updated welcome channel to {value}.",ephemeral=True)
+            await interaction.response.send_message(f"Updated welcome channel to {value}.")
         elif setting == "Welcome Image":
             IMG_WELCOME = value
             with open("settings.json","w") as f:
                 json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
             
-            await interaction.response.send_message(f"Updated welcome image to {value}.",ephemeral=True)
+            await interaction.response.send_message(f"Updated welcome image to {value}.")
         elif setting == "Leveling Requirement":
             LEVELING_REQUIREMENT = int(value)
             with open("settings.json","w") as f:
                 json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
 
-            await interaction.response.send_message(f"Updated leveling requirement to {value}.",ephemeral=True)
+            await interaction.response.send_message(f"Updated leveling requirement to {value}.")
         elif setting == "Leveling Channel":
             LEVELING_CHANNEL = int(value)
             with open("settings.json","w") as f:
                 json.dump({"welcome_channel":WELCOME_CHANNEL,"img_welcome":IMG_WELCOME,"leveling_requirement":LEVELING_REQUIREMENT,"leveling_channel":LEVELING_CHANNEL},f)
 
-            await interaction.response.send_message(f"Updated leveling channel to {value}.",ephemeral=True)
+            await interaction.response.send_message(f"Updated leveling channel to {value}.")
         else:
-            await interaction.response.send_message("Invalid setting.",ephemeral=True)
+            await interaction.response.send_message("Invalid setting.")
     else:
         await interaction.response.send_message("You do not have permission to run this command!")
 
@@ -162,7 +168,7 @@ async def reaction_roles(interaction: discord.Interaction, message: str, emoji: 
             try:
                 del reactionRoles[message][emoji]
             except KeyError:
-                await interaction.response.send_message("Reaction role not found!",ephemeral=True)
+                await interaction.response.send_message("Reaction role not found!")
         else:
             if message not in reactionRoles:
                 reactionRoles[message] = {}
@@ -173,7 +179,7 @@ async def reaction_roles(interaction: discord.Interaction, message: str, emoji: 
         with open("reaction_roles.json","w") as f:
             json.dump(reactionRoles,f)
 
-        await interaction.response.send_message("Reaction role updated!",ephemeral=True)            
+        await interaction.response.send_message("Reaction role updated!")            
     else:
         await interaction.response.send_message("You do not have permission to run this command!")
 
