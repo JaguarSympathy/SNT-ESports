@@ -84,7 +84,7 @@ async def on_reaction_add(reaction: discord.Reaction,member: discord.Member):
         reactionRoles = json.load(f)
     
     try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][str(reaction.emoji)])
+        role = discord.utils.get(member.guild.roles,id=reactionRoles[str(reaction.message.id)][str(reaction.emoji)])
         await member.add_roles(role,reason="Reaction role")
 
         embed = discord.Embed(title="Reaction Roles",description=f"You have been added to the role {role.name}.",colour=discord.Colour.green()).set_author(name=member.display_name,icon_url=member.avatar.url)
@@ -98,7 +98,7 @@ async def on_reaction_remove(reaction: discord.Reaction,member: discord.Member):
         reactionRoles = json.load(f)
     
     try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[reaction.message.id][str(reaction.emoji)])
+        role = discord.utils.get(member.guild.roles,id=reactionRoles[str(reaction.message.id)][str(reaction.emoji)])
         await member.remove_roles(role,reason="Reaction role")
 
         embed = discord.Embed(title="Reaction Roles",description=f"You have been removed from the role {role.name}.",colour=discord.Colour.red()).set_author(name=member.display_name,icon_url=member.avatar.url)
@@ -162,8 +162,6 @@ async def reaction_roles(interaction: discord.Interaction, message: str, emoji: 
         with open("reaction_roles.json","r") as f:
             reactionRoles = json.load(f)
         
-        message = int(message)
-
         if remove:
             try:
                 del reactionRoles[message][emoji]
