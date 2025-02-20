@@ -26,9 +26,31 @@ ANNOUNCEMENTS = 1322616470244429964
 SNT_GUILD = 1318946168943677472
 LEVELING_CHANNEL = 1327362472318996551
 
+REACTION_ROLE_1 = 000000000000000000
+
 # -- Initialisation -- #
 client = discord.Client(intents=discord.Intents.all())
 tree = app_commands.CommandTree(client=client)
+
+# -- Classes -- #
+class ReactionRoles(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @discord.ui.button(label="Reaction Role 1",style=discord.ButtonStyle.blurple)
+    async def reaction_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not isinstance(interaction.user, discord.Member):
+            await interaction.response.send_message(f"ERR 001 User `{interaction.user.name}` not a member")        
+        else:
+            role = interaction.guild.get_role(REACTION_ROLE_1)
+            if role in interaction.user.roles:
+                await interaction.user.remove_roles(role,reason="Reaction role")
+                embed = discord.Embed(title="Reaction Roles",description=f"You have been removed from the role {role.name}.",colour=discord.Colour.red()).set_author(name=interaction.user.display_name,icon_url=interaction.user.avatar.url)
+            else:
+                await interaction.user.add_roles(role,reason="Reaction role")
+                embed = discord.Embed(title="Reaction Roles",description=f"You have been added to the role {role.name}.",colour=discord.Colour.green()).set_author(name=interaction.user.display_name,icon_url=interaction.user.avatar.url)
+            
+            await interaction.response.send_message(interaction.user.mention,embed=embed)
 
 # -- Events -- #
 @client.event
@@ -78,33 +100,6 @@ async def on_message(message: discord.Message):
             channel = await client.fetch_channel(ANNOUNCEMENTS)
             await channel.send(message.content[10:])
             
-@client.event
-async def on_reaction_add(reaction: discord.Reaction,member: discord.Member):
-    with open("reaction_roles.json","r") as f:
-        reactionRoles = json.load(f)
-    
-    try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[str(reaction.message.id)][str(reaction.emoji)])
-        await member.add_roles(role,reason="Reaction role")
-
-        embed = discord.Embed(title="Reaction Roles",description=f"You have been added to the role {role.name}.",colour=discord.Colour.green()).set_author(name=member.display_name,icon_url=member.avatar.url)
-        await member.send(embed=embed)
-    except KeyError:
-        pass
-
-@client.event
-async def on_reaction_remove(reaction: discord.Reaction,member: discord.Member):
-    with open("reaction_roles.json","r") as f:
-        reactionRoles = json.load(f)
-    
-    try:
-        role = discord.utils.get(member.guild.roles,id=reactionRoles[str(reaction.message.id)][str(reaction.emoji)])
-        await member.remove_roles(role,reason="Reaction role")
-
-        embed = discord.Embed(title="Reaction Roles",description=f"You have been removed from the role {role.name}.",colour=discord.Colour.red()).set_author(name=member.display_name,icon_url=member.avatar.url)
-        await member.send(embed=embed)
-    except KeyError:
-        pass
 
 # -- Commands -- #
 @tree.command(name="settings",description="Update bot settings")
@@ -159,24 +154,7 @@ async def level(interaction: discord.Interaction):
 @app_commands.describe(message="Message ID to add reaction role to",emoji="Emoji to react with",role="Role to add", remove="Remove the reaction role")
 async def reaction_roles(interaction: discord.Interaction, message: str, emoji: str, role: discord.Role, remove: bool = False):
     if interaction.user.id == DEVELOPER or interaction.user.id == OWNER:
-        with open("reaction_roles.json","r") as f:
-            reactionRoles = json.load(f)
-        
-        if remove:
-            try:
-                del reactionRoles[message][emoji]
-            except KeyError:
-                await interaction.response.send_message("Reaction role not found!")
-        else:
-            if message not in reactionRoles:
-                reactionRoles[message] = {}
-            
-            reactionRoles[message][emoji] = role.id
-
-            await interaction.response.send_message("Reaction role updated!") 
-
-        with open("reaction_roles.json","w") as f:
-            json.dump(reactionRoles,f)           
+        await interaction.response.send_message(view=ReactionRoles())
     else:
         await interaction.response.send_message("You do not have permission to run this command!")
 
